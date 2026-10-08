@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# ETL data (downloaded cache + built artifacts)
+raw/
+output/
+
+# Tooling metadata
+.workbuddy/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

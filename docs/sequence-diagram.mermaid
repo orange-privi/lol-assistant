@@ -1,0 +1,56 @@
+sequenceDiagram
+    autonumber
+    participant CLI as main.fetch
+    participant FS as fetch_support
+    participant DS as DataSources
+    participant HTTP as HttpClient
+    participant CD as CommunityDragon
+
+    CLI->>FS: fetch_support(version, locale)
+    FS->>DS: download_monster_index()
+    DS->>HTTP: save_text(characters/, index.html)
+    HTTP->>CD: GET game/data/characters/
+    CD-->>HTTP: HTML
+    HTTP-->>DS: html (cache 命中则读 raw)
+    FS->>FS: codenames = list_monster_codenames(html)
+    loop 每个 codename（80）
+        FS->>DS: download_monster_bin(codename)
+        DS->>HTTP: save_json_optional(.../{codename}.bin.json)
+        HTTP->>CD: GET bin.json
+        CD-->>HTTP: JSON / HTML(个别失败)
+    end
+    FS->>DS: download_stringtable("en_us")
+    DS->>HTTP: save_json_optional(game/en_us/.../lol.stringtable.json)
+    FS->>DS: download_stringtable(stringtable_locale_dir(locale))
+    DS->>HTTP: save_json_optional(game/{locdir}/.../lol.stringtable.json)
+    FS-->>CLI: [OK] monster raw warmed
+
+    Note over CLI,CD: ===== build 离线复跑 =====
+    participant P as pipeline.build
+    participant MP as parser.monster
+    participant W as db.writer
+    participant DB as SQLite
+
+    CLI->>P: build(version, locale)
+    P->>DS: download_monster_index()
+    DS-->>P: index_html | None
+    alt index 缺失
+        P->>P: [WARN] monster 段跳过
+    else 正常
+        P->>MP: list_monster_codenames(index_html)
+        MP-->>P: codenames (sorted)
+        loop 每个 codename
+            P->>DS: download_monster_bin(codename)
+            DS-->>P: bin_json | None
+        end
+        P->>DS: download_stringtable("en_us")
+        P->>DS: download_stringtable(locale_dir)
+        DS-->>P: en_entries, zh_entries
+        P->>MP: parse_monsters(codenames, bins, zh, en, db_version)
+        MP->>MP: root_of -> should_include -> classify -> resolve_name -> monster_row
+        MP-->>P: rows (27)
+        P->>W: write_monsters(conn, rows)
+        W->>DB: INSERT OR REPLACE INTO monster ...
+    end
+    P->>W: write_meta(schema_version="5", ...)
+    P->>DB: commit + VACUUM

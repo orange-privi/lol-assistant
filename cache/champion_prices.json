@@ -1,0 +1,687 @@
+{
+ "dataVersion": "16.20.1",
+ "note": "BE 由 RP 档位推导；缺 T-Z 段（页面截断），未收录的英雄 UI 显示占位",
+ "prices": {
+  "Aatrox": {
+   "be": 2400,
+   "name": "Aatrox",
+   "rp": 880
+  },
+  "Ahri": {
+   "be": 1575,
+   "name": "Ahri",
+   "rp": 790
+  },
+  "Akali": {
+   "be": 1575,
+   "name": "Akali",
+   "rp": 790
+  },
+  "Akshan": {
+   "be": 2400,
+   "name": "Akshan",
+   "rp": 880
+  },
+  "Alistar": {
+   "be": 675,
+   "name": "Alistar",
+   "rp": 585
+  },
+  "Ambessa": {
+   "be": 3150,
+   "name": "Ambessa",
+   "rp": 975
+  },
+  "Amumu": {
+   "be": 225,
+   "name": "Amumu",
+   "rp": 260
+  },
+  "Anivia": {
+   "be": 1575,
+   "name": "Anivia",
+   "rp": 790
+  },
+  "Annie": {
+   "be": 225,
+   "name": "Annie",
+   "rp": 260
+  },
+  "Aphelios": {
+   "be": 2400,
+   "name": "Aphelios",
+   "rp": 880
+  },
+  "Ashe": {
+   "be": 225,
+   "name": "Ashe",
+   "rp": 260
+  },
+  "AurelionSol": {
+   "be": 2400,
+   "name": "Aurelion Sol",
+   "rp": 880
+  },
+  "Aurora": {
+   "be": 2400,
+   "name": "Aurora",
+   "rp": 880
+  },
+  "Azir": {
+   "be": 2400,
+   "name": "Azir",
+   "rp": 880
+  },
+  "Bard": {
+   "be": 2400,
+   "name": "Bard",
+   "rp": 880
+  },
+  "Belveth": {
+   "be": 1575,
+   "name": "Bel'Veth",
+   "rp": 790
+  },
+  "Blitzcrank": {
+   "be": 675,
+   "name": "Blitzcrank",
+   "rp": 585
+  },
+  "Brand": {
+   "be": 225,
+   "name": "Brand",
+   "rp": 260
+  },
+  "Braum": {
+   "be": 1575,
+   "name": "Braum",
+   "rp": 790
+  },
+  "Briar": {
+   "be": 2400,
+   "name": "Briar",
+   "rp": 880
+  },
+  "Caitlyn": {
+   "be": 225,
+   "name": "Caitlyn",
+   "rp": 260
+  },
+  "Camille": {
+   "be": 2400,
+   "name": "Camille",
+   "rp": 880
+  },
+  "Cassiopeia": {
+   "be": 2400,
+   "name": "Cassiopeia",
+   "rp": 880
+  },
+  "Chogath": {
+   "be": 675,
+   "name": "Cho'Gath",
+   "rp": 585
+  },
+  "Corki": {
+   "be": 1575,
+   "name": "Corki",
+   "rp": 790
+  },
+  "Darius": {
+   "be": 225,
+   "name": "Darius",
+   "rp": 260
+  },
+  "Diana": {
+   "be": 225,
+   "name": "Diana",
+   "rp": 260
+  },
+  "DrMundo": {
+   "be": 225,
+   "name": "Dr. Mundo",
+   "rp": 260
+  },
+  "Draven": {
+   "be": 2400,
+   "name": "Draven",
+   "rp": 880
+  },
+  "Ekko": {
+   "be": 1575,
+   "name": "Ekko",
+   "rp": 790
+  },
+  "Elise": {
+   "be": 2400,
+   "name": "Elise",
+   "rp": 880
+  },
+  "Evelynn": {
+   "be": 675,
+   "name": "Evelynn",
+   "rp": 585
+  },
+  "Ezreal": {
+   "be": 675,
+   "name": "Ezreal",
+   "rp": 585
+  },
+  "Fiddlesticks": {
+   "be": 675,
+   "name": "Fiddlesticks",
+   "rp": 585
+  },
+  "Fiora": {
+   "be": 2400,
+   "name": "Fiora",
+   "rp": 880
+  },
+  "Fizz": {
+   "be": 675,
+   "name": "Fizz",
+   "rp": 585
+  },
+  "Galio": {
+   "be": 1575,
+   "name": "Galio",
+   "rp": 790
+  },
+  "Gangplank": {
+   "be": 1575,
+   "name": "Gangplank",
+   "rp": 790
+  },
+  "Garen": {
+   "be": 225,
+   "name": "Garen",
+   "rp": 260
+  },
+  "Gnar": {
+   "be": 2400,
+   "name": "Gnar",
+   "rp": 880
+  },
+  "Gragas": {
+   "be": 1575,
+   "name": "Gragas",
+   "rp": 790
+  },
+  "Graves": {
+   "be": 2400,
+   "name": "Graves",
+   "rp": 880
+  },
+  "Gwen": {
+   "be": 2400,
+   "name": "Gwen",
+   "rp": 880
+  },
+  "Hecarim": {
+   "be": 2400,
+   "name": "Hecarim",
+   "rp": 880
+  },
+  "Heimerdinger": {
+   "be": 1575,
+   "name": "Heimerdinger",
+   "rp": 790
+  },
+  "Hwei": {
+   "be": 2400,
+   "name": "Hwei",
+   "rp": 880
+  },
+  "Illaoi": {
+   "be": 1575,
+   "name": "Illaoi",
+   "rp": 790
+  },
+  "Irelia": {
+   "be": 1575,
+   "name": "Irelia",
+   "rp": 790
+  },
+  "Ivern": {
+   "be": 2400,
+   "name": "Ivern",
+   "rp": 880
+  },
+  "Janna": {
+   "be": 675,
+   "name": "Janna",
+   "rp": 585
+  },
+  "JarvanIV": {
+   "be": 1575,
+   "name": "Jarvan IV",
+   "rp": 790
+  },
+  "Jax": {
+   "be": 675,
+   "name": "Jax",
+   "rp": 585
+  },
+  "Jayce": {
+   "be": 2400,
+   "name": "Jayce",
+   "rp": 880
+  },
+  "Jhin": {
+   "be": 2400,
+   "name": "Jhin",
+   "rp": 880
+  },
+  "Jinx": {
+   "be": 1575,
+   "name": "Jinx",
+   "rp": 790
+  },
+  "KSante": {
+   "be": 2400,
+   "name": "K'Sante",
+   "rp": 880
+  },
+  "Kaisa": {
+   "be": 675,
+   "name": "Kai'Sa",
+   "rp": 585
+  },
+  "Kalista": {
+   "be": 2400,
+   "name": "Kalista",
+   "rp": 880
+  },
+  "Karma": {
+   "be": 1575,
+   "name": "Karma",
+   "rp": 790
+  },
+  "Karthus": {
+   "be": 1575,
+   "name": "Karthus",
+   "rp": 790
+  },
+  "Kassadin": {
+   "be": 1575,
+   "name": "Kassadin",
+   "rp": 790
+  },
+  "Katarina": {
+   "be": 1575,
+   "name": "Katarina",
+   "rp": 790
+  },
+  "Kayle": {
+   "be": 225,
+   "name": "Kayle",
+   "rp": 260
+  },
+  "Kayn": {
+   "be": 1575,
+   "name": "Kayn",
+   "rp": 790
+  },
+  "Kennen": {
+   "be": 2400,
+   "name": "Kennen",
+   "rp": 880
+  },
+  "Khazix": {
+   "be": 2400,
+   "name": "Kha'Zix",
+   "rp": 880
+  },
+  "Kindred": {
+   "be": 2400,
+   "name": "Kindred",
+   "rp": 880
+  },
+  "Kled": {
+   "be": 2400,
+   "name": "Kled",
+   "rp": 880
+  },
+  "KogMaw": {
+   "be": 2400,
+   "name": "Kog'Maw",
+   "rp": 880
+  },
+  "Leblanc": {
+   "be": 1575,
+   "name": "LeBlanc",
+   "rp": 790
+  },
+  "LeeSin": {
+   "be": 675,
+   "name": "Lee Sin",
+   "rp": 585
+  },
+  "Leona": {
+   "be": 225,
+   "name": "Leona",
+   "rp": 260
+  },
+  "Lillia": {
+   "be": 2400,
+   "name": "Lillia",
+   "rp": 880
+  },
+  "Lissandra": {
+   "be": 2400,
+   "name": "Lissandra",
+   "rp": 880
+  },
+  "Locke": {
+   "be": 2400,
+   "name": "Locke",
+   "rp": 880
+  },
+  "Lucian": {
+   "be": 675,
+   "name": "Lucian",
+   "rp": 585
+  },
+  "Lulu": {
+   "be": 2400,
+   "name": "Lulu",
+   "rp": 880
+  },
+  "Lux": {
+   "be": 225,
+   "name": "Lux",
+   "rp": 260
+  },
+  "Malphite": {
+   "be": 225,
+   "name": "Malphite",
+   "rp": 260
+  },
+  "Malzahar": {
+   "be": 2400,
+   "name": "Malzahar",
+   "rp": 880
+  },
+  "Maokai": {
+   "be": 2400,
+   "name": "Maokai",
+   "rp": 880
+  },
+  "MasterYi": {
+   "be": 225,
+   "name": "Master Yi",
+   "rp": 260
+  },
+  "Mel": {
+   "be": 3150,
+   "name": "Mel",
+   "rp": 975
+  },
+  "Milio": {
+   "be": 2400,
+   "name": "Milio",
+   "rp": 880
+  },
+  "MissFortune": {
+   "be": 225,
+   "name": "Miss Fortune",
+   "rp": 260
+  },
+  "Mordekaiser": {
+   "be": 675,
+   "name": "Mordekaiser",
+   "rp": 585
+  },
+  "Morgana": {
+   "be": 675,
+   "name": "Morgana",
+   "rp": 585
+  },
+  "Naafiri": {
+   "be": 675,
+   "name": "Naafiri",
+   "rp": 585
+  },
+  "Nami": {
+   "be": 1575,
+   "name": "Nami",
+   "rp": 790
+  },
+  "Nasus": {
+   "be": 675,
+   "name": "Nasus",
+   "rp": 585
+  },
+  "Nautilus": {
+   "be": 2400,
+   "name": "Nautilus",
+   "rp": 880
+  },
+  "Neeko": {
+   "be": 2400,
+   "name": "Neeko",
+   "rp": 880
+  },
+  "Nidalee": {
+   "be": 1575,
+   "name": "Nidalee",
+   "rp": 790
+  },
+  "Nilah": {
+   "be": 2400,
+   "name": "Nilah",
+   "rp": 880
+  },
+  "Nocturne": {
+   "be": 1575,
+   "name": "Nocturne",
+   "rp": 790
+  },
+  "Nunu": {
+   "be": 225,
+   "name": "Nunu & Willump",
+   "rp": 260
+  },
+  "Olaf": {
+   "be": 1575,
+   "name": "Olaf",
+   "rp": 790
+  },
+  "Orianna": {
+   "be": 2400,
+   "name": "Orianna",
+   "rp": 880
+  },
+  "Ornn": {
+   "be": 2400,
+   "name": "Ornn",
+   "rp": 880
+  },
+  "Pantheon": {
+   "be": 675,
+   "name": "Pantheon",
+   "rp": 585
+  },
+  "Poppy": {
+   "be": 225,
+   "name": "Poppy",
+   "rp": 260
+  },
+  "Pyke": {
+   "be": 1575,
+   "name": "Pyke",
+   "rp": 790
+  },
+  "Qiyana": {
+   "be": 2400,
+   "name": "Qiyana",
+   "rp": 880
+  },
+  "Quinn": {
+   "be": 2400,
+   "name": "Quinn",
+   "rp": 880
+  },
+  "Rakan": {
+   "be": 2400,
+   "name": "Rakan",
+   "rp": 880
+  },
+  "Rammus": {
+   "be": 675,
+   "name": "Rammus",
+   "rp": 585
+  },
+  "RekSai": {
+   "be": 2400,
+   "name": "Rek'Sai",
+   "rp": 880
+  },
+  "Rell": {
+   "be": 2400,
+   "name": "Rell",
+   "rp": 880
+  },
+  "Renata": {
+   "be": 2400,
+   "name": "Renata Glasc",
+   "rp": 880
+  },
+  "Renekton": {
+   "be": 2400,
+   "name": "Renekton",
+   "rp": 880
+  },
+  "Rengar": {
+   "be": 2400,
+   "name": "Rengar",
+   "rp": 880
+  },
+  "Riven": {
+   "be": 2400,
+   "name": "Riven",
+   "rp": 880
+  },
+  "Rumble": {
+   "be": 2400,
+   "name": "Rumble",
+   "rp": 880
+  },
+  "Ryze": {
+   "be": 225,
+   "name": "Ryze",
+   "rp": 260
+  },
+  "Samira": {
+   "be": 1575,
+   "name": "Samira",
+   "rp": 790
+  },
+  "Sejuani": {
+   "be": 225,
+   "name": "Sejuani",
+   "rp": 260
+  },
+  "Senna": {
+   "be": 1575,
+   "name": "Senna",
+   "rp": 790
+  },
+  "Seraphine": {
+   "be": 1575,
+   "name": "Seraphine",
+   "rp": 790
+  },
+  "Sett": {
+   "be": 675,
+   "name": "Sett",
+   "rp": 585
+  },
+  "Shaco": {
+   "be": 1575,
+   "name": "Shaco",
+   "rp": 790
+  },
+  "Shen": {
+   "be": 1575,
+   "name": "Shen",
+   "rp": 790
+  },
+  "Shyvana": {
+   "be": 1575,
+   "name": "Shyvana",
+   "rp": 790
+  },
+  "Singed": {
+   "be": 225,
+   "name": "Singed",
+   "rp": 260
+  },
+  "Sion": {
+   "be": 675,
+   "name": "Sion",
+   "rp": 585
+  },
+  "Sivir": {
+   "be": 225,
+   "name": "Sivir",
+   "rp": 260
+  },
+  "Skarner": {
+   "be": 2400,
+   "name": "Skarner",
+   "rp": 880
+  },
+  "Smolder": {
+   "be": 3150,
+   "name": "Smolder",
+   "rp": 975
+  },
+  "Sona": {
+   "be": 225,
+   "name": "Sona",
+   "rp": 260
+  },
+  "Soraka": {
+   "be": 225,
+   "name": "Soraka",
+   "rp": 260
+  },
+  "Swain": {
+   "be": 1575,
+   "name": "Swain",
+   "rp": 790
+  },
+  "Sylas": {
+   "be": 1575,
+   "name": "Sylas",
+   "rp": 790
+  },
+  "Syndra": {
+   "be": 1575,
+   "name": "Syndra",
+   "rp": 790
+  },
+  "TahmKench": {
+   "be": 2400,
+   "name": "Tahm Kench",
+   "rp": 880
+  },
+  "Taliyah": {
+   "be": 2400,
+   "name": "Taliyah",
+   "rp": 880
+  },
+  "Talon": {
+   "be": 1575,
+   "name": "Talon",
+   "rp": 790
+  },
+  "TwistedFate": {
+   "be": 225,
+   "name": "Twisted Fate",
+   "rp": 260
+  }
+ },
+ "source": "https://wiki.leagueoflegends.com/en-us/List_of_champions"
+}

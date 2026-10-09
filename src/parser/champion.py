@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from .calculation import normalize_damage_type
+from .prices import price_of
 from .skin import parse_skins
 from .spell import make_spell, parse_ddragon_spells
 from .util import clean_rich_text, int_value, text
@@ -44,6 +45,8 @@ def parse_champion(
     champion: dict[str, Any],
     version: str,
     cdragon: dict[str, Any] | None = None,
+    prices: dict[str, dict[str, int]] | None = None,
+    available_skins: set[str] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     stats = champion.get("stats") or {}
     info = champion.get("info") or {}
@@ -55,6 +58,10 @@ def parse_champion(
     playstyle = _playstyle(cdragon)
     tag_primary, tag_secondary = _tags(cdragon, champion.get("tags") or [])
 
+    # Price (BE/RP) is not exposed by Data Dragon nor CommunityDragon v1; it is
+    # merged from the hand-maintained cache (missing id -> 0, never invented).
+    price_be, price_rp = price_of(prices, champion_id)
+
     # Data Dragon Chinese champion JSON is the primary localized source.
     # CommunityDragon supplements fields Data Dragon does not localize.
     entity = {
@@ -64,9 +71,8 @@ def parse_champion(
         "title": text(champion.get("title")),
         "nameEn": text((cdragon or {}).get("name")) or champion_id,
         "titleEn": text((cdragon or {}).get("title")),
-        # Price (BE/RP) is not exposed by Data Dragon nor CommunityDragon v1.
-        "priceBe": 0,
-        "priceRp": 0,
+        "priceBe": price_be,
+        "priceRp": price_rp,
         "lore": clean_rich_text(text(champion.get("lore"))),
         "blurb": clean_rich_text(text(champion.get("blurb"))),
         "tags": ",".join(champion.get("tags") or []),
@@ -130,6 +136,12 @@ def parse_champion(
             )
         )
 
-    skins = parse_skins(cdragon, champion_id, champion_key)
+    skins = parse_skins(
+        cdragon,
+        champion_id,
+        champion_key,
+        champion.get("skins"),
+        available_skins,
+    )
 
     return entity, spells, skins

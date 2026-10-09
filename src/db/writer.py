@@ -46,7 +46,7 @@ ITEM_COLUMNS = [
 SUMMONER_COLUMNS = [
     "id", "key", "name", "description", "tooltip",
     "cooldown", "cooldownBurn", "costBurn", "rangeBurn",
-    "modes", "icon",
+    "modes", "castLevel", "charges", "recharge", "effect", "icon",
 ]
 
 RUNE_TREE_COLUMNS = ["id", "key", "name", "icon"]
@@ -54,6 +54,15 @@ RUNE_TREE_COLUMNS = ["id", "key", "name", "icon"]
 RUNE_COLUMNS = [
     "id", "treeId", "slot", "key", "name",
     "shortDesc", "longDesc", "icon",
+]
+
+MONSTER_COLUMNS = [
+    "id", "name", "nameEn", "category", "camp", "tags",
+    "hp", "hpPerLevel", "attackDamage", "attackDamagePerLevel",
+    "armor", "armorPerLevel", "magicResist", "magicResistPerLevel",
+    "moveSpeed", "attackSpeed", "attackRange",
+    "goldGiven", "goldGivenTotal", "expGiven", "expGivenTotal",
+    "icon", "dataVersion",
 ]
 
 
@@ -118,6 +127,13 @@ def write_runes(
 ) -> None:
     insert_rows(connection, "rune_tree", RUNE_TREE_COLUMNS, trees)
     insert_rows(connection, "rune", RUNE_COLUMNS, runes)
+
+
+def write_monsters(
+    connection: sqlite3.Connection,
+    monsters: list[dict[str, Any]],
+) -> None:
+    insert_rows(connection, "monster", MONSTER_COLUMNS, monsters)
 
 
 def write_meta(

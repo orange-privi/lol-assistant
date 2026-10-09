@@ -36,6 +36,13 @@ def int_value(value: Any, default: int = 0) -> int:
         return default
 
 
+def float_value(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def json_array(values: Any) -> str:
     if values is None:
         return "[]"

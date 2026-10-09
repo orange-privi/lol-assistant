@@ -1,0 +1,108 @@
+classDiagram
+    class Config {
+        <<module>>
+        +int SCHEMA_VERSION = 5
+        +str CDRAGON_GAME
+        +str CDRAGON_CHARACTERS_DIR
+        +str CDRAGON_STRINGTABLE
+        +str CDRAGON_STRINGTABLE_LOCALE = "en_us"
+        +dict CDRAGON_LOCALE_DIRS
+    }
+
+    class HttpClient {
+        +get_json(url) Any
+        +get_text(url) str
+        +save_json(url, path, use_cache=True) Any
+        +save_json_optional(url, path, use_cache=True) Any|None
+        +save_text(url, path, use_cache=True) str
+    }
+
+    class DataSources {
+        +str version
+        +str locale
+        +HttpClient http
+        +_raw(*parts) Path
+        +cdragon_locale() str
+        +stringtable_locale_dir(locale) str
+        +download_monster_index() str|None
+        +download_monster_bin(codename) dict|None
+        +download_stringtable(locdir) dict|None
+    }
+
+    class MonsterParser {
+        <<module: src/parser/monster.py>>
+        +set MONSTER_EXTRA_INCLUDE
+        +set MONSTER_EXCLUDE
+        +dict MONSTER_ICONS
+        +set TIER_TOKENS
+        +list_monster_codenames(index_html) list
+        +root_of(bin_json) dict|None
+        +should_include(tags, codename) bool
+        +classify(tags) tuple
+        +resolve_name(entries, key) str
+        +monster_row(codename, bin_json, zh, en, data_version) dict|None
+        +parse_monsters(codenames, bins, zh, en, data_version) list
+    }
+
+    class Util {
+        <<module: src/parser/util.py>>
+        +text(value, default) str
+        +int_value(value, default) int
+        +float_value(value, default) float
+    }
+
+    class MonsterRow {
+        +str id
+        +str name
+        +str nameEn
+        +str category
+        +str camp
+        +str tags
+        +float hp
+        +float hpPerLevel
+        +float attackDamage
+        +float attackDamagePerLevel
+        +float armor
+        +float armorPerLevel
+        +float magicResist
+        +float magicResistPerLevel
+        +float moveSpeed
+        +float attackSpeed
+        +float attackRange
+        +int goldGiven
+        +int goldGivenTotal
+        +int expGiven
+        +int expGivenTotal
+        +str icon
+        +str dataVersion
+    }
+
+    class Writer {
+        <<module: src/db/writer.py>>
+        +list MONSTER_COLUMNS
+        +write_monsters(conn, rows) None
+        +insert_rows(conn, table, cols, rows) None
+    }
+
+    class Schema {
+        <<module: src/db/schema.py>>
+        +str SCHEMA
+        +create_database(path) Connection
+    }
+
+    class Pipeline {
+        <<module: src/pipeline.py>>
+        +build(version, locale) Path
+        +fetch_support(version, locale) None
+        +stats(db_path) None
+        +_build_monsters(sources, db_version) list
+    }
+
+    DataSources --> HttpClient : uses
+    DataSources ..> Config : reads constants
+    Pipeline --> DataSources : orchestrates
+    Pipeline --> MonsterParser : pure calls
+    Pipeline --> Writer : write_monsters
+    MonsterParser ..> Util : text/int_value/float_value
+    Writer --> Schema : table contract
+    MonsterParser ..> MonsterRow : produces

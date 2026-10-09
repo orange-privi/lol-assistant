@@ -1,0 +1,677 @@
+{
+  "source": "LoL Wiki Module:SpellData/data (+ zh-CN sandbox)",
+  "fetchedAt": "2026-10-09T08:13:55.136248+00:00",
+  "spellCount": 67,
+  "spells": {
+    "Backtrack": {
+      "dispName": "回溯",
+      "nameEn": "Backtrack",
+      "cooldown": 180,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Banner of Command": {
+      "dispName": "号令之旗",
+      "nameEn": "Banner of Command",
+      "cooldown": 60,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Barrier": {
+      "dispName": "屏障",
+      "nameEn": "Barrier",
+      "cooldown": 180,
+      "castLevel": 4,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Blade Waltz": {
+      "dispName": "利刃华尔兹",
+      "nameEn": "Blade Waltz",
+      "cooldown": 45,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Blasting Smite": {
+      "dispName": "爆裂惩戒",
+      "nameEn": "Blasting Smite",
+      "cooldown": 15,
+      "castLevel": 9,
+      "charges": 2,
+      "recharge": 90,
+      "maps": "sr,nb,tt",
+      "effect": "对目标中型和大型野怪、敌方小兵或英雄召唤物造成390 – 1000 （基于等级） 真实伤害。"
+    },
+    "Bounce of the Poro King": {
+      "dispName": "魄罗之王的弹跳",
+      "nameEn": "Bounce of the Poro King",
+      "cooldown": 45,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Castle": {
+      "dispName": "王车易位",
+      "nameEn": "Castle",
+      "cooldown": 12,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Challenging Smite": {
+      "dispName": "挑战惩戒",
+      "nameEn": "Challenging Smite",
+      "cooldown": 15,
+      "castLevel": 9,
+      "charges": 2,
+      "recharge": 90,
+      "maps": "sr,nb,tt",
+      "effect": ""
+    },
+    "Chemtech Dash": {
+      "dispName": "炼金科技冲刺",
+      "nameEn": "Chemtech Dash",
+      "cooldown": 0,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Chemtech Mark": {
+      "dispName": "炼金科技标记",
+      "nameEn": "Chemtech Mark",
+      "cooldown": 80,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Chilling Smite": {
+      "dispName": "深寒惩戒",
+      "nameEn": "Chilling Smite",
+      "cooldown": 15,
+      "castLevel": 9,
+      "charges": 2,
+      "recharge": 90,
+      "maps": "sr,nb,tt",
+      "effect": ""
+    },
+    "Clairvoyance": {
+      "dispName": "洞察",
+      "nameEn": "Clairvoyance",
+      "cooldown": 60,
+      "castLevel": 8,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,tt,cs",
+      "effect": ""
+    },
+    "Clarity": {
+      "dispName": "清晰术",
+      "nameEn": "Clarity",
+      "cooldown": 240,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha,tt,cs",
+      "effect": ""
+    },
+    "Cleanse": {
+      "dispName": "净化",
+      "nameEn": "Cleanse",
+      "cooldown": 240,
+      "castLevel": 9,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Dash": {
+      "dispName": "冲刺",
+      "nameEn": "Dash",
+      "cooldown": 0,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Demonic Clasp": {
+      "dispName": "Demonic Clasp",
+      "nameEn": "Demonic Clasp",
+      "cooldown": 18,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Droppybara": {
+      "dispName": "卡皮巴拉空投",
+      "nameEn": "Droppybara",
+      "cooldown": 45,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Empowered Recall": {
+      "dispName": "强化回城",
+      "nameEn": "Empowered Recall",
+      "cooldown": 0,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,nb,tt,cs",
+      "effect": ""
+    },
+    "Defensive Maneuvers": {
+      "dispName": "防御计略",
+      "nameEn": "Defensive Maneuvers",
+      "cooldown": 40,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Die Another Day": {
+      "dispName": "择日赴死",
+      "nameEn": "Die Another Day",
+      "cooldown": 60,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Enhanced Recall": {
+      "dispName": "回城（统治战场）",
+      "nameEn": "Enhanced Recall",
+      "cooldown": 0,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "cs",
+      "effect": ""
+    },
+    "Evocation": {
+      "dispName": "活力焕发",
+      "nameEn": "Evocation",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Exhaust": {
+      "dispName": "虚弱",
+      "nameEn": "Exhaust",
+      "cooldown": 240,
+      "castLevel": 4,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Flash": {
+      "dispName": "闪现",
+      "nameEn": "Flash",
+      "cooldown": 300,
+      "castLevel": 7,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ar,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Feel the Burn": {
+      "dispName": "感受燃烧",
+      "nameEn": "Feel the Burn",
+      "cooldown": 20,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": "对1000码范围内的所有敌方英雄施放 虚弱和 引燃，前者的 减速效果提升至50%，后者转而在持续期间共造成100 – 600 （基于等级）真实伤害。"
+    },
+    "Flee": {
+      "dispName": "闪人",
+      "nameEn": "Flee",
+      "cooldown": 45,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Fortify": {
+      "dispName": "强化要塞",
+      "nameEn": "Fortify",
+      "cooldown": 300,
+      "castLevel": 5,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "cs",
+      "effect": ""
+    },
+    "Frozen Foundations": {
+      "dispName": "冰封地基",
+      "nameEn": "Frozen Foundations",
+      "cooldown": 15,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Garrison": {
+      "dispName": "卫戍部队",
+      "nameEn": "Garrison",
+      "cooldown": 210,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "cs",
+      "effect": ""
+    },
+    "Ghost": {
+      "dispName": "幽灵疾步",
+      "nameEn": "Ghost",
+      "cooldown": 240,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Growth Spurt": {
+      "dispName": "生机迸发",
+      "nameEn": "Growth Spurt",
+      "cooldown": 45,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Heal": {
+      "dispName": "治疗术",
+      "nameEn": "Heal",
+      "cooldown": 240,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Hexflash": {
+      "dispName": "海克斯科技闪现",
+      "nameEn": "Hexflash",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Hextech Dash": {
+      "dispName": "海克斯科技冲刺",
+      "nameEn": "Hextech Dash",
+      "cooldown": 0,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Hextech Mark": {
+      "dispName": "海克斯科技标记",
+      "nameEn": "Hextech Mark",
+      "cooldown": 80,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": "主动：向目标方向朝远处扔出一枚海克斯科技手榴弹，对命中的首个敌方单位造成15 – 100 （基于等级） 真实伤害，并提供目标的 真实视野，持续3秒。在接下来的3秒内，你可以再次施放 海克斯科技冲刺。"
+    },
+    "Ignite": {
+      "dispName": "引燃",
+      "nameEn": "Ignite",
+      "cooldown": 180,
+      "castLevel": 9,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,nb,tt,cs",
+      "effect": ""
+    },
+    "Interference": {
+      "dispName": "干扰",
+      "nameEn": "Interference",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Laser Heal": {
+      "dispName": "激光治疗",
+      "nameEn": "Laser Heal",
+      "cooldown": 30,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Mark": {
+      "dispName": "标记",
+      "nameEn": "Mark",
+      "cooldown": 80,
+      "castLevel": 6,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Now You See Me": {
+      "dispName": "位移魔术",
+      "nameEn": "Now You See Me",
+      "cooldown": 10,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Observer": {
+      "dispName": "观战者",
+      "nameEn": "Observer",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr",
+      "effect": ""
+    },
+    "Orbital Laser": {
+      "dispName": "轨道镭射",
+      "nameEn": "Orbital Laser",
+      "cooldown": 20,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Poltergeist": {
+      "dispName": "吵闹鬼",
+      "nameEn": "Poltergeist",
+      "cooldown": 40,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Poro Charge": {
+      "dispName": "Poro Charge",
+      "nameEn": "Poro Charge",
+      "cooldown": 70,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Poro Dash": {
+      "dispName": "魄罗冲刺",
+      "nameEn": "Poro Dash",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Poro Toss": {
+      "dispName": "魄罗投掷",
+      "nameEn": "Poro Toss",
+      "cooldown": 80,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Primal Smite": {
+      "dispName": "原初惩戒",
+      "nameEn": "Primal Smite",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "",
+      "effect": ""
+    },
+    "Promote": {
+      "dispName": "晋升",
+      "nameEn": "Promote",
+      "cooldown": 180,
+      "castLevel": 8,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,tt,cs",
+      "effect": ""
+    },
+    "Rally": {
+      "dispName": "战争图腾",
+      "nameEn": "Rally",
+      "cooldown": 270,
+      "castLevel": 8,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr",
+      "effect": ""
+    },
+    "Recall": {
+      "dispName": "回城",
+      "nameEn": "Recall",
+      "cooldown": 0,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ar,nb,tt",
+      "effect": ""
+    },
+    "Resuscitate": {
+      "dispName": "复苏",
+      "nameEn": "Resuscitate",
+      "cooldown": 100,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "",
+      "effect": ""
+    },
+    "Revive": {
+      "dispName": "重生",
+      "nameEn": "Revive",
+      "cooldown": 540,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,tt",
+      "effect": ""
+    },
+    "Scavenging Smite": {
+      "dispName": "食腐惩戒",
+      "nameEn": "Scavenging Smite",
+      "cooldown": 15,
+      "castLevel": 9,
+      "charges": 2,
+      "recharge": 90,
+      "maps": "sr,nb,tt",
+      "effect": ""
+    },
+    "Smite": {
+      "dispName": "惩戒",
+      "nameEn": "Smite",
+      "cooldown": 15,
+      "castLevel": 3,
+      "charges": 2,
+      "recharge": 90,
+      "maps": "sr,nb,tt",
+      "effect": ""
+    },
+    "Spellcraft": {
+      "dispName": "Spellcraft",
+      "nameEn": "Spellcraft",
+      "cooldown": 15,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Stifle": {
+      "dispName": "Stifle",
+      "nameEn": "Stifle",
+      "cooldown": 150,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,tt,cs",
+      "effect": ""
+    },
+    "Surge": {
+      "dispName": "战意激增",
+      "nameEn": "Surge",
+      "cooldown": 180,
+      "castLevel": 1,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,ha,tt,cs",
+      "effect": ""
+    },
+    "Teleport": {
+      "dispName": "传送",
+      "nameEn": "Teleport",
+      "cooldown": 300,
+      "castLevel": 7,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,nb,tt,cs",
+      "effect": ""
+    },
+    "Time Stop": {
+      "dispName": "时间停止",
+      "nameEn": "Time Stop",
+      "cooldown": 30,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "To the King!": {
+      "dispName": "护驾！",
+      "nameEn": "To the King!",
+      "cooldown": 10,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Unleashed Smite": {
+      "dispName": "解封的惩戒",
+      "nameEn": "Unleashed Smite",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "",
+      "effect": ""
+    },
+    "Unleashed Teleport": {
+      "dispName": "解封的传送",
+      "nameEn": "Unleashed Teleport",
+      "cooldown": 0,
+      "castLevel": 7,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "sr,nb,tt,cs",
+      "effect": ""
+    },
+    "Vanish": {
+      "dispName": "遁入暗影",
+      "nameEn": "Vanish",
+      "cooldown": 30,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Warmup Routine": {
+      "dispName": "热身动作",
+      "nameEn": "Warmup Routine",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    },
+    "Warp": {
+      "dispName": "折跃",
+      "nameEn": "Warp",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 3,
+      "recharge": 15,
+      "maps": "",
+      "effect": ""
+    },
+    "When the Darkness Comes": {
+      "dispName": "When the Darkness Comes",
+      "nameEn": "When the Darkness Comes",
+      "cooldown": 75,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ha",
+      "effect": ""
+    },
+    "Zhonya's Epiphany": {
+      "dispName": "中娅显灵",
+      "nameEn": "Zhonya's Epiphany",
+      "cooldown": 0,
+      "castLevel": 0,
+      "charges": 0,
+      "recharge": 0,
+      "maps": "ar",
+      "effect": ""
+    }
+  }
+}

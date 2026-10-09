@@ -77,3 +77,43 @@ class HttpClient:
         except Exception as exc:  # noqa: BLE001 - degraded source is tolerated
             print(f"[WARN] unavailable {url}: {exc}")
             return None
+
+    def save_text(
+        self,
+        url: str,
+        path: Path,
+        use_cache: bool = True,
+    ) -> str:
+        """Fetch text and persist it verbatim. Reuses an existing file when cached.
+
+        Unlike :meth:`save_json` this never parses the payload -- the Wiki
+        module endpoint answers with JSON, but the extracted Lua body is plain
+        text, so it must be written through untouched.
+        """
+        if use_cache and path.exists():
+            return path.read_text(encoding="utf-8")
+
+        value = self.get_text(url)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value, encoding="utf-8")
+        return value
+
+    def post_json(self, url: str, data: dict[str, Any]) -> Any:
+        """POST a form-encoded body and return the parsed JSON response.
+
+        Used for ``action=parse`` (the Wiki wikitext renderer). Shares the
+        session/session headers and retry policy with the GET helpers.
+        """
+        last_error: Exception | None = None
+        for attempt in range(1, self.retries + 1):
+            try:
+                response = self.session.post(
+                    url, data=data, timeout=self.timeout
+                )
+                response.raise_for_status()
+                return response.json()
+            except (requests.RequestException, ValueError) as exc:
+                last_error = exc
+                if attempt < self.retries:
+                    time.sleep(self.backoff ** attempt)
+        raise last_error  # type: ignore[misc]

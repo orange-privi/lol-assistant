@@ -132,6 +132,10 @@ CREATE TABLE summoner_spell (
     costBurn TEXT NOT NULL,
     rangeBurn TEXT NOT NULL,
     modes TEXT NOT NULL,
+    castLevel INTEGER NOT NULL DEFAULT 0,
+    charges INTEGER NOT NULL DEFAULT 0,
+    recharge INTEGER NOT NULL DEFAULT 0,
+    effect TEXT NOT NULL DEFAULT '',
     icon TEXT NOT NULL
 );
 
@@ -160,6 +164,36 @@ CREATE TABLE rune (
 
 CREATE INDEX idx_rune_treeId ON rune(treeId);
 CREATE INDEX idx_rune_name ON rune(name);
+
+CREATE TABLE monster (
+    id                   TEXT    PRIMARY KEY NOT NULL,
+    name                 TEXT    NOT NULL,
+    nameEn               TEXT    NOT NULL,
+    category             TEXT    NOT NULL,
+    camp                 TEXT    NOT NULL,
+    tags                 TEXT    NOT NULL,
+    hp                   REAL    NOT NULL,
+    hpPerLevel           REAL    NOT NULL,
+    attackDamage         REAL    NOT NULL,
+    attackDamagePerLevel REAL    NOT NULL,
+    armor                REAL    NOT NULL,
+    armorPerLevel        REAL    NOT NULL,
+    magicResist          REAL    NOT NULL,
+    magicResistPerLevel  REAL    NOT NULL,
+    moveSpeed            REAL    NOT NULL,
+    attackSpeed          REAL    NOT NULL,
+    attackRange          REAL    NOT NULL,
+    goldGiven            INTEGER NOT NULL,
+    goldGivenTotal       INTEGER NOT NULL,
+    expGiven             INTEGER NOT NULL,
+    expGivenTotal        INTEGER NOT NULL,
+    icon                 TEXT    NOT NULL,
+    dataVersion          TEXT    NOT NULL
+);
+
+CREATE INDEX idx_monster_name     ON monster(name);
+CREATE INDEX idx_monster_camp     ON monster(camp);
+CREATE INDEX idx_monster_category ON monster(category);
 
 CREATE TABLE meta (
     key TEXT PRIMARY KEY NOT NULL,

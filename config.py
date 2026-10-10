@@ -7,7 +7,7 @@ OUTPUT_DIR = ROOT / "output"
 CDRAGON_BASE = "https://raw.communitydragon.org"
 DDRAGON_BASE = "https://ddragon.leagueoflegends.com"
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 7
 
 # League of Legends Wiki (MediaWiki) -- authoritative numeric summoner-spell
 # data (cooldown / level / range / charges / recharge / maps / effect) that

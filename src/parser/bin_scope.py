@@ -50,6 +50,63 @@ def _icon_index(
     return index
 
 
+def scope_spell_keys(
+    bin_json: dict[str, Any] | None,
+    champion_id: str,
+    script_id: str,
+    slot: str,
+    icon_stems: Iterable[str] = (),
+) -> list[str]:
+    """Return the BIN object *keys* belonging to a single spell.
+
+    Same three-tier match as :func:`scope_spell_objects`; kept separate so
+    callers that need the key itself (its leaf segment is the client script
+    name, used to look up the string-table tooltip) do not have to re-derive it
+    by scanning values.
+    """
+    if not bin_json:
+        return []
+
+    prefix = _spell_prefix(champion_id)
+
+    # 1. Primary: match by Data Dragon script name (exact leaf segment).
+    if script_id:
+        matched = [
+            key
+            for key, value in bin_json.items()
+            if key.startswith(prefix)
+            and key.rsplit("/", 1)[-1] == script_id
+            and isinstance(value, dict)
+        ]
+        if matched:
+            return matched
+
+    # 2. Fallback: match by slot-derived container name (case-insensitive).
+    containers = _container_candidates(champion_id, slot)
+    matched = []
+    for key, value in bin_json.items():
+        if not key.startswith(prefix) or not isinstance(value, dict):
+            continue
+        leaf = key[len(prefix):].split("/", 1)[0]
+        if leaf.lower() in containers:
+            matched.append(key)
+    if matched:
+        return matched
+
+    # 3. Last resort (passives): match by ability icon stem.
+    stems = {icon_stem(s) for s in icon_stems if s}
+    if stems:
+        index = _icon_index(bin_json, champion_id)
+        seen: set[str] = set()
+        for stem in stems:
+            for key in index.get(stem, []):
+                if key not in seen:
+                    seen.add(key)
+                    matched.append(key)
+
+    return matched
+
+
 def scope_spell_objects(
     bin_json: dict[str, Any] | None,
     champion_id: str,
@@ -60,43 +117,9 @@ def scope_spell_objects(
     """Return the BIN subtrees belonging to a single spell."""
     if not bin_json:
         return []
-
-    prefix = _spell_prefix(champion_id)
-
-    # 1. Primary: match by Data Dragon script name (exact leaf segment).
-    if script_id:
-        matched = [
-            value
-            for key, value in bin_json.items()
-            if key.startswith(prefix)
-            and key.rsplit("/", 1)[-1] == script_id
-        ]
-        if matched:
-            return matched
-
-    # 2. Fallback: match by slot-derived container name (case-insensitive).
-    containers = _container_candidates(champion_id, slot)
-    matched = []
-    for key, value in bin_json.items():
-        if not key.startswith(prefix):
-            continue
-        leaf = key[len(prefix):].split("/", 1)[0]
-        if leaf.lower() in containers:
-            matched.append(value)
-    if matched:
-        return matched
-
-    # 3. Last resort (passives): match by ability icon stem.
-    stems = {icon_stem(s) for s in icon_stems if s}
-    if stems:
-        index = _icon_index(bin_json, champion_id)
-        keys: list[str] = []
-        for stem in stems:
-            keys.extend(index.get(stem, []))
-        seen: set[str] = set()
-        for key in keys:
-            if key not in seen:
-                seen.add(key)
-                matched.append(bin_json[key])
-
-    return matched
+    return [
+        bin_json[key]
+        for key in scope_spell_keys(
+            bin_json, champion_id, script_id, slot, icon_stems
+        )
+    ]

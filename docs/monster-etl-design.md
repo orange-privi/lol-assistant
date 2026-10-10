@@ -1,7 +1,7 @@
 # 野怪（Monster）ETL 设计文档
 
 > 目标仓库：`lol-assistant-data`（Python ETL → SQLite → Android Room）
-> 产出：单表 `monster`，schema **v5**；只做 ETL 侧，不改 Android 仓库 `lolok`。
+> 产出：单表 `monster`，schema **v5**（**v7 增列 `effect`/`effectEn`，并新增 `monster_buff` 表**，见 §15）；只做 ETL 侧，不改 Android 仓库 `lolok`。
 > 本文档所有关键事实（字段名、图标名、筛选命中、本地化解析）均已用 venv Python + requests 实测复核，结论内联标注。
 
 ---
@@ -699,6 +699,104 @@ graph LR
 | `resolve_name` 兜底 | 键为空 / 表中无键 → `""` |
 | `parse_monsters` 确定性 | 同输入两次调用 → 行列表完全相同（同序） |
 | `parse_monsters` 单条失败 | bins 内含 `None` → 该条跳过，其余不受影响 |
+
+---
+
+## 15. schema v7 扩展：击杀说明 `effect` + 奖励 buff 目录 `monster_buff`
+
+> 起因：Android `MonsterEffectPanel`（击杀效果面板）此前只能写「本地数据没有任何效果文案」。
+> 实测确认**数据存在**，只是没采 —— 全在客户端字符串表 `zh_cn.lol.stringtable.json`
+> （ETL 已为野怪缓存的同一份）。**不新增任何数据源**。
+
+### 15.1 `monster.effect` / `effectEn`（每只野怪的击杀/说明文案）
+
+| 项 | 结论（实测） |
+| --- | --- |
+| 主源 | `game_character_enemytooltip_<x>`（游戏内「敌方信息」面板，正文含击杀奖励） |
+| 兜底 | `game_character_description_<x>`（少数单位只有这个，如**海克斯科技亚龙**） |
+| 键派生 | `Root.name`（`game_character_displayname_Baron`）→ 前缀换成 `enemytooltip_`/`description_` 并**小写** → `game_character_enemytooltip_baron` |
+| 取哪一段 | 只取 `<mainText>`（`spelltext.main_text`），丢掉 `titleLeft`/`subtitle*`/`postScript*`（免得名字重复） |
+| 清洗 | 复用 `spelltext.clean_official_text`（清 `{{ }}`、`%i:`、空成对标记、实体）；**保留**客户端标记与 `@占位符@` |
+| **覆盖率** | **22 / 27** |
+| 空值 5 只 | `sru_atakhan`（26.1 已移除）、`sru_dragon_chemtech`、`sru_horde`、`sru_horde_mini`、`sru_krugminimini`（客户端就是没有这个键） |
+
+**⚠️ 石甲虫「分裂」在当前文案里没有**：16.20 的 `sru_krug` 敌方信息只有
+`击败这个野怪会回复少量的法力值和生命值。`；「在被击杀时分裂为2个普通石甲虫」
+只在 **2015 赛季旧键** `game_character_enemytooltip_s2015_srukrug` 里，而分裂机制本身
+只是技能 `SpawnMiniKrug_Mis`，**没有文字描述**。→ 不编造，`effect` 保持官方文案。
+
+### 15.2 新表 `monster_buff`（奖励 buff 目录，19 行）
+
+**没有机器可读字段把「奖励 buff」关联到野怪** → 沿用 `MONSTER_ICONS` 的做法：
+**硬编码目录 `MONSTER_BUFF_CATALOG`**（`src/parser/monster.py`）给出每条的
+`(id, kind, camp, 描述键[, 名称键])`，文案本身从字符串表键取，**不手抄**。
+
+| kind | 条数 | 内容（id → 名称） |
+| --- | --- | --- |
+| `epic` | 5 | `baron_hand`男爵之手 · `elder_wrath`巨龙威势(含斩杀) · `rift_herald`虚空掠影 · `void_touch`虚空之触 · `void_hunger`虚空之饥饿 |
+| `drake` | 6 | `drake_{infernal,cloud,ocean,mountain,chemtech,hextech}`（炼狱/云霄/海洋/山脉/炼金科技/海克斯科技 巨龙） |
+| `soul` | 6 | `soul_{infernal,cloud,ocean,mountain,chemtech,hextech}`（六个龙魂） |
+| `camp` | 2 | `blue_crest`洞悉之冠(蓝buff) · `red_crest`余烬之冠(红buff) |
+
+* 名称解析：优先描述键的 `<titleLeft>`；没有时回退目录里的 `name_key`
+  （**六个龙魂**都是这种，如 `buff_dragonsoulinfernal_name` = 炼狱龙魂）。
+* **缺失降级**：本地化描述取不到 → **不建行**（空菜单项没信息，不编造）；
+  整张字符串表缺失 → 0 行 + `[WARN]`，build 照常完成。
+* **只收现役野怪**：厄塔汗 26.1 已移除，其 2025 赛季奖励（杀戮之冠 / 伪造生命 /
+  心灵净化 / 血花瓣）**刻意不入目录**。
+* **不建 icon 列**：CommunityDragon 无 `game/data/buffs/`，占位符（`@Spell.X:Y@`）
+  离线又算不出 → 目录只承载文字，避免恒空噪声列。
+
+### 15.3 DDL 增量（`SCHEMA_VERSION 6 → 7`）
+
+```sql
+-- monster 表新增两列（紧跟 tags）
+ALTER ... effect TEXT NOT NULL, effectEn TEXT NOT NULL   -- 见 src/db/schema.py 定稿
+
+CREATE TABLE monster_buff (
+    id            TEXT PRIMARY KEY NOT NULL,  -- 稳定键，如 'baron_hand'
+    name          TEXT NOT NULL,
+    nameEn        TEXT NOT NULL,
+    kind          TEXT NOT NULL,              -- epic | drake | soul | camp
+    camp          TEXT NOT NULL,              -- 对齐 monster.camp
+    description   TEXT NOT NULL,
+    descriptionEn TEXT NOT NULL,
+    dataVersion   TEXT NOT NULL
+);
+CREATE INDEX idx_monster_buff_kind ON monster_buff(kind);
+CREATE INDEX idx_monster_buff_camp ON monster_buff(camp);
+```
+
+> 说明：库每次全量重建，不存在 migration；`inspect --monster` 已顺带打印该营地
+> 的 buff 行，`stats` 表清单已加 `monster_buff`。
+
+### 15.4 实测（16.20 / zh_CN）
+
+* `monsters=27 monsterBuffs=19`；`schema_version=7`。
+* `effect` 填充 **22/27**，空值正是上表 5 只；`tooltipRendered` 仍 **155**（无回归）。
+* **残留审计 0**：`effect*` / `description*` / `name*` 全表无 `{{ }}`、`%i:`、
+  `<titleLeft>`、`<postScript`、`<subtitle`、`@@`。
+* 目录 19 行**名称与描述均非空**（`name`/`nameEn` 全覆盖）。
+
+### 15.5 落地文件
+
+| 文件 | 改动 |
+| --- | --- |
+| `config.py` | `SCHEMA_VERSION 6 → 7` |
+| `src/db/schema.py` | `monster` 加 `effect`/`effectEn`；新增 `monster_buff` 表 + 2 索引 |
+| `src/db/writer.py` | `MONSTER_COLUMNS` 加两列；新增 `MONSTER_BUFF_COLUMNS` + `write_monster_buffs()` |
+| `src/parser/spelltext.py` | `_main_text`/`_title_left` 提为公开 `main_text()`/`title_left()`（供野怪复用）；行为不变 |
+| `src/parser/monster.py` | 新增 `plain_text`/`official_body`/`monster_effect_keys`/`resolve_effect`；`BuffSpec` + `MONSTER_BUFF_CATALOG` + `buff_name`/`monster_buff_row`/`parse_monster_buffs`；`monster_row` 补两列 |
+| `src/pipeline.py` | `_load_monster_stringtables()` 抽出（表只读一次）；`_build_monsters` 返回 `(rows, zh, en)`；`build()` 写 `monster_buff`；`stats`/`inspect` 更新 |
+| `tests/test_monster.py` | 新增 11 个用例（effect 派生/取段/兜底、buff 目录名与降级、确定性） |
+| `README.md` | schema v6→v7；`What gets built` 加 `monster_buff`；新增 v7 章节 |
+
+### 15.6 未做 / 后续
+
+* **buff 图标**：无稳定来源，留空（Android 侧可先用营地图标）。
+* **占位符求值**：`@Spell.SRX_DragonBuffInfernal:ADandAPPercentIncrease*100@` 这类
+  跨技能引用离线算不出，**原样存库**交由客户端（同 `tooltipRendered` 的分工）。
+* **`champion_spell` 同源的 `@Spell.X:Y@` 求值**仍是已知上游可改进点。
 
 ---
 

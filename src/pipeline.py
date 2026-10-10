@@ -18,6 +18,7 @@ from .db.writer import (
     write_champion,
     write_items,
     write_meta,
+    write_monster_buffs,
     write_monsters,
     write_runes,
     write_summoner_spells,
@@ -25,8 +26,10 @@ from .db.writer import (
 from .downloader.http import HttpClient
 from .downloader.sources import DataSources
 from .parser.base_stats import apply_missing_stats, bin_base_stats
-from .parser.bin_scope import icon_stem, scope_spell_objects
+from .parser.bin_scope import icon_stem, scope_spell_keys, scope_spell_objects
 from .parser.calculation import (
+    collect_raw_calculations,
+    evaluate_calculations,
     extract_calculations,
     extract_data_values,
     extract_effects,
@@ -34,10 +37,20 @@ from .parser.calculation import (
 )
 from .parser.champion import parse_champion
 from .parser.item import parse_items
-from .parser.monster import list_monster_codenames, parse_monsters
+from .parser.monster import (
+    list_monster_codenames,
+    parse_monster_buffs,
+    parse_monsters,
+)
 from .parser.prices import load_champion_prices
 from .parser.rune import parse_runes
 from .parser.skin_availability import load_skin_availability
+from .parser.spell import (
+    DDRAGON_SPELL_KEY,
+    backfill_cost_from_resource,
+    effect_values,
+)
+from .parser.spelltext import SpellTextIndex, official_tooltip, token_names
 from .parser.summoner import parse_summoner_spells
 from .parser.util import dumps, int_value
 from .parser.wiki_summoner import (
@@ -79,6 +92,11 @@ def enrich_spell_from_bin(
 
     Returns False when no matching BIN objects were found.
     """
+    # Data Dragon 侧那几样「BIN 里没有」的数值（`eN` / `cost` / `maxammo`）与
+    # 消耗模板，取自 `parse_ddragon_spells` 暂存的原始技能对象，用完即弃。
+    ddragon_spell = spell.pop(DDRAGON_SPELL_KEY, None) or {}
+    ddragon_values = effect_values(ddragon_spell)
+
     scoped = scope_spell_objects(
         bin_json,
         champion_id,
@@ -87,6 +105,11 @@ def enrich_spell_from_bin(
         icon_stems,
     )
     if not scoped:
+        # 没有 BIN 数据，但 Data Dragon 的 `eN` 依旧可用 —— 落库，
+        # 免得客户端连这部分都填不出。
+        if ddragon_values:
+            spell["dataValuesJson"] = dumps(ddragon_values)
+            backfill_cost_from_resource(ddragon_spell, spell, ddragon_values)
         return False
 
     calculations: dict[str, Any] = {}
@@ -101,38 +124,125 @@ def enrich_spell_from_bin(
             bucket = effects.setdefault(key, [])
             bucket.extend(value if isinstance(value, list) else [value])
 
+    # Data Dragon 的补位数值排在 BIN 之后；同名的（大小写不敏感）以 BIN 为准 ——
+    # 客户端查表也是大小写不敏感的，两处同名会让取值变得看运气。
+    merged = dict(data_values)
+    taken = {str(name).lower() for name in merged}
+    for name, values in ddragon_values.items():
+        if name.lower() in taken:
+            continue
+        taken.add(name.lower())
+        merged[name] = values
+
+    # 客户端渲染不出来的改写式/静态式：能静态算出的直接算成逐级数值并进命名
+    # 数值表，客户端查表时优先取到它们（见 `evaluate_calculations`）。
+    for name, values in evaluate_calculations(
+        collect_raw_calculations(scoped),
+        calculations,
+        merged,
+        int_value(spell.get("maxRank"), 1),
+    ).items():
+        merged[name] = values
+
     spell["calculationJson"] = dumps(calculations)
-    spell["dataValuesJson"] = dumps(data_values)
+    spell["dataValuesJson"] = dumps(merged)
     spell["effectsJson"] = dumps(effects)
     spell["damageType"] = spell_damage_type(calculations) or spell.get(
         "damageType", ""
     )
+    backfill_cost_from_resource(ddragon_spell, spell, merged)
     return True
 
 
-def _build_monsters(
-    sources: DataSources, db_version: str
-) -> list[dict[str, Any]]:
-    """Read the cached monster sources and return ``monster`` rows.
+def load_stringtable_entries(sources: DataSources) -> dict[str, Any]:
+    """Localized client string-table entries for the build locale.
 
-    Everything is read cache-first from ``raw/`` (no dedicated ``cache/``
-    artefact). Every source degrades gracefully: a missing directory listing
-    yields no rows, a single failed BIN is skipped, and missing string tables
-    leave the name columns empty -- the build never aborts here.
-
-    Kept as a standalone function so it can be exercised without a full build.
+    Cache-first (``fetch`` warms ``raw/``); a missing or corrupt table degrades
+    to ``{}`` so the build still completes -- the spell-text index then reports
+    itself unusable and every ``tooltipRendered`` stays ``''``.
     """
-    index_html = sources.download_monster_index()
-    if not index_html:
-        print("[WARN] monster index unavailable; skipping monster section")
-        return []
+    table = sources.download_stringtable(
+        sources.stringtable_locale_dir(sources.locale)
+    )
+    entries = table.get("entries") if isinstance(table, dict) else None
+    return entries if isinstance(entries, dict) else {}
 
-    codenames = list_monster_codenames(index_html)
-    bins: dict[str, Any] = {
-        codename: sources.download_monster_bin(codename)
-        for codename in codenames
-    }
 
+def spell_value_names(spell: dict[str, Any]) -> set[str]:
+    """本技能能取到的数值名（小写），来自命名数值表与计算式。
+
+    与 `spelltext.token_names` 求交集即可判断「这段官方文案能不能真的填出数」。
+    """
+    names: set[str] = set()
+    for column in ("dataValuesJson", "calculationJson"):
+        try:
+            payload = json.loads(spell.get(column) or "{}")
+        except ValueError:
+            continue
+        if isinstance(payload, dict):
+            names.update(str(key).lower() for key in payload)
+    return names
+
+
+def render_spell_text(
+    spell: dict[str, Any],
+    bin_json: dict[str, Any] | None,
+    champion_id: str,
+    icon_stems: tuple[str, ...],
+    index: SpellTextIndex,
+) -> str:
+    """Official client text for one spell, or ``''`` when it is not needed.
+
+    Two gates, both deliberate:
+
+    * **Only when Data Dragon cannot fill the numbers.** Its Q/W/E/R tooltips
+      carry ``{{ token }}`` placeholders that the client already renders from
+      ``dataValuesJson`` / ``calculationJson``; only the passive (P) is a
+      numberless prose sentence, so it is the one slot that needs the client
+      string table instead. Widening this gate is a one-line change, but it
+      would replace 692 already-working tooltips.
+    * **Only when the text actually carries a fillable number.** A chunk of the
+      candidates are prose without a single ``@token@`` (or only tokens this
+      spell has no values for, e.g. ``@f1@`` index placeholders) -- those add
+      nothing over Data Dragon's ``description``, and some of them read like a
+      *unit-state* description rather than an ability one
+      (``这个单位被击晕了。``). Leaving the column empty there is the correct
+      answer: the client falls back to exactly what it does today.
+
+    The returned text keeps its client markup *and* its ``@Token@``
+    placeholders -- rendering is the client's job (see ``spelltext``).
+    """
+    if "{{" in (spell.get("tooltip") or ""):
+        return ""
+
+    scripts = [
+        key.rsplit("/", 1)[-1]
+        for key in scope_spell_keys(
+            bin_json,
+            champion_id,
+            spell.get("id") or "",
+            spell.get("slot") or "",
+            icon_stems,
+        )
+    ]
+    text = official_tooltip(index, scripts, spell.get("name") or "", champion_id)
+    if not text:
+        return ""
+
+    known = spell_value_names(spell)
+    if not (token_names(text) & known):
+        return ""
+    return text
+
+
+def _load_monster_stringtables(
+    sources: DataSources,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Both localized string tables for the monster section, each degrading to ``{}``.
+
+    Returns ``(build-locale entries, en_us entries)``. A missing/corrupt table
+    only empties the names / effect text -- the build never aborts here.
+    """
     build_locdir = sources.stringtable_locale_dir(sources.locale)
     en_table = sources.download_stringtable(CDRAGON_STRINGTABLE_LOCALE)
     build_table = (
@@ -150,17 +260,49 @@ def _build_monsters(
     if not zh_entries:
         print(
             "[WARN] monster stringtable "
-            f"({build_locdir}) unavailable; name defaults to ''"
+            f"({build_locdir}) unavailable; name/effect default to ''"
         )
     if not en_entries:
         print(
             "[WARN] monster stringtable "
-            f"({CDRAGON_STRINGTABLE_LOCALE}) unavailable; nameEn defaults to ''"
+            f"({CDRAGON_STRINGTABLE_LOCALE}) unavailable; nameEn/effectEn "
+            "default to ''"
         )
+    return (zh_entries or {}), (en_entries or {})
 
-    return parse_monsters(
+
+def _build_monsters(
+    sources: DataSources, db_version: str
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
+    """Read the cached monster sources and return ``monster`` rows.
+
+    Everything is read cache-first from ``raw/`` (no dedicated ``cache/``
+    artefact). Every source degrades gracefully: a missing directory listing
+    yields no rows, a single failed BIN is skipped, and missing string tables
+    leave the name / effect columns empty -- the build never aborts here.
+
+    Also returns the two string-table entry dicts, so the reward-buff catalogue
+    (:func:`parse_monster_buffs`) can be built without re-reading a 33 MB table.
+
+    Kept as a standalone function so it can be exercised without a full build.
+    """
+    zh_entries, en_entries = _load_monster_stringtables(sources)
+
+    index_html = sources.download_monster_index()
+    if not index_html:
+        print("[WARN] monster index unavailable; skipping monster section")
+        return [], zh_entries, en_entries
+
+    codenames = list_monster_codenames(index_html)
+    bins: dict[str, Any] = {
+        codename: sources.download_monster_bin(codename)
+        for codename in codenames
+    }
+
+    rows = parse_monsters(
         codenames, bins, zh_entries, en_entries, db_version
     )
+    return rows, zh_entries, en_entries
 
 
 def build(version: str, locale: str) -> Path:
@@ -214,6 +356,16 @@ def build(version: str, locale: str) -> Path:
     if wiki_pack:
         print(f"[INFO] wiki summoner spells: {len(wiki_pack)} entries")
 
+    # -- Client string table (skill text for the spells Data Dragon can't fill) --
+    # Cache-first; missing/corrupt -> unusable index -> every ``tooltipRendered``
+    # stays ''. Never a network fetch here: once warmed by ``fetch`` (or the
+    # monster section) this is a plain file read.
+    spell_text = SpellTextIndex(load_stringtable_entries(sources))
+    if spell_text.is_usable():
+        print("[INFO] client spell text available for tooltipRendered")
+    else:
+        print("[WARN] client stringtable unavailable; tooltipRendered stays empty")
+
     # -- Static catalogues (single pass) ----------------------------------
     items = parse_items(base["items"])
     summoners = parse_summoner_spells(base["summoners"], wiki_pack)
@@ -236,6 +388,7 @@ def build(version: str, locale: str) -> Path:
 
     # -- Champions --------------------------------------------------------
     empty_spells = 0
+    rendered_spells = 0
     for index, champion_id in enumerate(champion_map, start=1):
         print(f"[{index}/{len(champion_map)}] {champion_id}")
 
@@ -259,18 +412,26 @@ def build(version: str, locale: str) -> Path:
             icons = passive_stems if spell.get("slot") == "P" else ()
             if not enrich_spell_from_bin(spell, bin_json, champion_id, icons):
                 empty_spells += 1
+            spell["tooltipRendered"] = render_spell_text(
+                spell, bin_json, champion_id, icons, spell_text
+            )
+            if spell["tooltipRendered"]:
+                rendered_spells += 1
 
         write_champion(connection, entity, spells, skins)
 
     if empty_spells:
         print(f"[WARN] {empty_spells} spells had no matching BIN data")
+    print(f"[INFO] tooltipRendered filled for {rendered_spells} spells")
 
     # -- Jungle monsters (Summoner's Rift) --------------------------------
     # Read straight from the cached ``raw/`` sources; a missing source degrades
     # to fewer (or zero) rows with a [WARN], never an aborted build.
-    monsters = _build_monsters(sources, db_version)
+    monsters, zh_entries, en_entries = _build_monsters(sources, db_version)
     write_monsters(connection, monsters)
-    print(f"[INFO] monsters={len(monsters)}")
+    buffs = parse_monster_buffs(zh_entries, en_entries, db_version)
+    write_monster_buffs(connection, buffs)
+    print(f"[INFO] monsters={len(monsters)} monsterBuffs={len(buffs)}")
 
     write_meta(
         connection,
@@ -474,6 +635,16 @@ def inspect(
             (monster, monster),
         ).fetchone()
         print(dict(row) if row else f"Monster not found: {monster}")
+        if row:
+            buffs = connection.execute(
+                "SELECT id, name, kind, camp, description "
+                "FROM monster_buff WHERE camp = ? ORDER BY id",
+                (row["camp"],),
+            ).fetchall()
+            for buff in buffs:
+                print(f"\n=== buff {buff['id']} "
+                      f"[{buff['kind']}/{buff['camp']}] {buff['name']} ===")
+                print(buff["description"])
         connection.close()
         return
 
@@ -491,7 +662,8 @@ def inspect(
 
     spells = connection.execute(
         """
-        SELECT slot, name, calculationJson, dataValuesJson, effectsJson
+        SELECT slot, name, calculationJson, dataValuesJson, effectsJson,
+               tooltipRendered
         FROM champion_spell
         WHERE championId = ?
         ORDER BY CASE slot
@@ -511,6 +683,7 @@ def inspect(
         print("calculations:", spell["calculationJson"])
         print("dataValues:", spell["dataValuesJson"])
         print("effects:", spell["effectsJson"])
+        print("tooltipRendered:", spell["tooltipRendered"] or "(empty)")
 
     skins = connection.execute(
         "SELECT COUNT(*) FROM champion_skin WHERE championId = ?",
@@ -532,6 +705,7 @@ def stats(db_path: str) -> None:
         "rune_tree",
         "rune",
         "monster",
+        "monster_buff",
         "meta",
     ]
     print(f"database: {db_path}")

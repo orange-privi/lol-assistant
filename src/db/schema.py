@@ -64,6 +64,7 @@ CREATE TABLE champion_spell (
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     tooltip TEXT NOT NULL,
+    tooltipRendered TEXT NOT NULL,
     cooldown TEXT NOT NULL,
     cost TEXT NOT NULL,
     range TEXT NOT NULL,
@@ -172,6 +173,8 @@ CREATE TABLE monster (
     category             TEXT    NOT NULL,
     camp                 TEXT    NOT NULL,
     tags                 TEXT    NOT NULL,
+    effect               TEXT    NOT NULL,
+    effectEn             TEXT    NOT NULL,
     hp                   REAL    NOT NULL,
     hpPerLevel           REAL    NOT NULL,
     attackDamage         REAL    NOT NULL,
@@ -194,6 +197,24 @@ CREATE TABLE monster (
 CREATE INDEX idx_monster_name     ON monster(name);
 CREATE INDEX idx_monster_camp     ON monster(camp);
 CREATE INDEX idx_monster_category ON monster(category);
+
+-- 野怪奖励增益目录（男爵之手 / 各元素亚龙增益 / 各龙魂 / 蓝红霸符 …）。
+-- 来源：客户端字符串表（`game_buff_tooltip_*` / `buff_*_tooltip` 等），
+-- 键与 camp 归属由 `src/parser/monster.py` 的显式目录给出（不编造）。
+-- 正文保留客户端标记与 `@占位符@`，由客户端渲染（与 champion_spell.tooltipRendered 一致）。
+CREATE TABLE monster_buff (
+    id            TEXT PRIMARY KEY NOT NULL,  -- 稳定键，如 'baron_hand' / 'soul_infernal'
+    name          TEXT NOT NULL,              -- 本地化名
+    nameEn        TEXT NOT NULL,              -- 英文名
+    kind          TEXT NOT NULL,              -- epic | drake | soul | camp
+    camp          TEXT NOT NULL,              -- 授予营地（对齐 monster.camp）；无 → ''
+    description   TEXT NOT NULL,              -- 效果正文（本地化）
+    descriptionEn TEXT NOT NULL,              -- 效果正文（英文）
+    dataVersion   TEXT NOT NULL               -- 数据版本（= db_version，如 '16.20'）
+);
+
+CREATE INDEX idx_monster_buff_kind ON monster_buff(kind);
+CREATE INDEX idx_monster_buff_camp ON monster_buff(camp);
 
 CREATE TABLE meta (
     key TEXT PRIMARY KEY NOT NULL,

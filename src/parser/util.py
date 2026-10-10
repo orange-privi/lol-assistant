@@ -51,6 +51,17 @@ def json_array(values: Any) -> str:
     return dumps(values)
 
 
+def json_number(value: Any) -> Any:
+    """JSON 里整数就写整数。
+
+    客户端按 `List<Double>` 读这些数组，`50` 与 `50.0` 都能吃；但 `50` 更干净、
+    也小一圈 —— 逐级数组在整包里出现上万次。非数值原样返回。
+    """
+    if isinstance(value, float) and value == int(value) and abs(value) < 1e15:
+        return int(value)
+    return value
+
+
 def clean_rich_text(value: str) -> str:
     if not value:
         return ""

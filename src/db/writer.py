@@ -22,7 +22,7 @@ CHAMPION_COLUMNS = [
 ]
 
 SPELL_COLUMNS = [
-    "championId", "slot", "name", "description", "tooltip",
+    "championId", "slot", "name", "description", "tooltip", "tooltipRendered",
     "cooldown", "cost", "range",
     "cooldownLevels", "costLevels", "rangeLevels",
     "maxRank", "icon",
@@ -58,11 +58,17 @@ RUNE_COLUMNS = [
 
 MONSTER_COLUMNS = [
     "id", "name", "nameEn", "category", "camp", "tags",
+    "effect", "effectEn",
     "hp", "hpPerLevel", "attackDamage", "attackDamagePerLevel",
     "armor", "armorPerLevel", "magicResist", "magicResistPerLevel",
     "moveSpeed", "attackSpeed", "attackRange",
     "goldGiven", "goldGivenTotal", "expGiven", "expGivenTotal",
     "icon", "dataVersion",
+]
+
+MONSTER_BUFF_COLUMNS = [
+    "id", "name", "nameEn", "kind", "camp",
+    "description", "descriptionEn", "dataVersion",
 ]
 
 
@@ -134,6 +140,13 @@ def write_monsters(
     monsters: list[dict[str, Any]],
 ) -> None:
     insert_rows(connection, "monster", MONSTER_COLUMNS, monsters)
+
+
+def write_monster_buffs(
+    connection: sqlite3.Connection,
+    buffs: list[dict[str, Any]],
+) -> None:
+    insert_rows(connection, "monster_buff", MONSTER_BUFF_COLUMNS, buffs)
 
 
 def write_meta(

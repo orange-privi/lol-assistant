@@ -1,13 +1,20 @@
 import unittest
 
 from src.parser.monster import (
+    MONSTER_BUFF_CATALOG,
     MONSTER_EXCLUDE,
     MONSTER_EXTRA_INCLUDE,
     MONSTER_ICONS,
     classify,
     list_monster_codenames,
+    monster_buff_row,
+    monster_effect_keys,
     monster_row,
+    official_body,
+    parse_monster_buffs,
     parse_monsters,
+    plain_text,
+    resolve_effect,
     resolve_name,
     should_include,
 )
@@ -166,6 +173,156 @@ class MonsterRowTest(unittest.TestCase):
     def test_missing_root_returns_none(self):
         self.assertIsNone(monster_row("sru_baron", None, {}, {}, "16.20"))
         self.assertIsNone(monster_row("sru_baron", {}, {}, {}, "16.20"))
+
+    def test_effect_filled_from_enemy_tooltip(self):
+        root = {
+            "unitTagsString": BARON_TAGS,
+            "name": "game_character_displayname_Baron",
+        }
+        entry = (
+            "<titleLeft>纳什男爵</titleLeft>"
+            "<subtitleLeft>史诗级野怪—团队增益</subtitleLeft>"
+            "<mainText>击杀这个野怪会提供男爵之手。</mainText>"
+        )
+        zh = {
+            "game_character_displayname_baron": "纳什男爵",
+            "game_character_enemytooltip_baron": entry,
+        }
+        en = {
+            "game_character_displayname_baron": "Baron Nashor",
+            "game_character_enemytooltip_baron": "Killing this monster grants Hand of Baron.",
+        }
+        row = monster_row(
+            "sru_baron", _bin_json("SRU_Baron", root), zh, en, "16.20"
+        )
+        # `<mainText>` only: the title/subtitle sections never leak into `effect`.
+        self.assertEqual(row["effect"], "击杀这个野怪会提供男爵之手。")
+        self.assertEqual(row["effectEn"], "Killing this monster grants Hand of Baron.")
+
+    def test_effect_empty_when_no_source(self):
+        root = {
+            "unitTagsString": BARON_TAGS,
+            "name": "game_character_displayname_Baron",
+        }
+        row = monster_row(
+            "sru_baron", _bin_json("SRU_Baron", root), {}, {}, "16.20"
+        )
+        self.assertEqual(row["effect"], "")
+        self.assertEqual(row["effectEn"], "")
+
+
+class PlainTextTest(unittest.TestCase):
+    def test_strips_nested_markup(self):
+        raw = "<titleLeft><font color='#FFFFFF'>男爵之手</font></titleLeft>"
+        self.assertEqual(plain_text(raw), "男爵之手")
+
+    def test_empty(self):
+        self.assertEqual(plain_text(""), "")
+
+
+class OfficialBodyTest(unittest.TestCase):
+    def test_prefers_main_text(self):
+        raw = (
+            "<titleLeft>炼狱亚龙</titleLeft>"
+            "<mainText>强化攻击力和法术强度。</mainText>"
+            "<postScriptLeft>来自：@SourceName@</postScriptLeft>"
+        )
+        self.assertEqual(official_body(raw), "强化攻击力和法术强度。")
+
+    def test_falls_back_without_main_text(self):
+        # Chemtech drake puts its body right after `<titleLeft>` (no mainText).
+        raw = "<titleLeft>炼金科技巨龙</titleLeft><br>每层提供 10% 韧性。"
+        body = official_body(raw)
+        self.assertEqual(body, "<br>每层提供 10% 韧性。")
+
+    def test_empty(self):
+        self.assertEqual(official_body(""), "")
+
+
+class MonsterEffectKeysTest(unittest.TestCase):
+    def test_derives_both_families(self):
+        keys = monster_effect_keys("game_character_displayname_SRUDragon_Hextech")
+        self.assertEqual(
+            keys,
+            (
+                "game_character_enemytooltip_srudragon_hextech",
+                "game_character_description_srudragon_hextech",
+            ),
+        )
+
+    def test_unexpected_key_shape(self):
+        self.assertEqual(monster_effect_keys(""), ())
+        self.assertEqual(monster_effect_keys("SomeOtherKey"), ())
+
+
+class ResolveEffectTest(unittest.TestCase):
+    def test_prefers_enemy_tooltip_then_description(self):
+        name_key = "game_character_displayname_SRUDragon"
+        only_description = {
+            "game_character_description_srudragon": "<mainText>说明</mainText>",
+        }
+        self.assertEqual(resolve_effect(only_description, name_key), "说明")
+
+        both = {
+            "game_character_enemytooltip_srudragon": "<mainText>首选</mainText>",
+            "game_character_description_srudragon": "<mainText>兜底</mainText>",
+        }
+        self.assertEqual(resolve_effect(both, name_key), "首选")
+
+    def test_missing_degrades_to_empty(self):
+        self.assertEqual(resolve_effect(None, "x"), "")
+        self.assertEqual(resolve_effect({}, "game_character_displayname_Baron"), "")
+
+
+class MonsterBuffCatalogTest(unittest.TestCase):
+    def test_ids_unique_and_kinds_known(self):
+        ids = [spec.id for spec in MONSTER_BUFF_CATALOG]
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertTrue(
+            {spec.kind for spec in MONSTER_BUFF_CATALOG}
+            <= {"epic", "drake", "soul", "camp"}
+        )
+
+    def test_row_uses_title_left_for_name(self):
+        spec = MONSTER_BUFF_CATALOG[0]  # baron_hand
+        entries = {
+            spec.description_key: (
+                "<titleLeft><font color='#FFF'>男爵之手</font></titleLeft>"
+                "<mainText>提升攻击力。</mainText>"
+            )
+        }
+        row = monster_buff_row(spec, entries, {}, "16.20")
+        self.assertEqual(row["name"], "男爵之手")
+        self.assertEqual(row["description"], "提升攻击力。")
+        self.assertEqual(row["kind"], spec.kind)
+        self.assertEqual(row["camp"], spec.camp)
+        self.assertEqual(row["nameEn"], "")
+
+    def test_row_falls_back_to_name_key(self):
+        # Dragon souls carry no `<titleLeft>`; the name comes from `*_name`.
+        spec = next(s for s in MONSTER_BUFF_CATALOG if s.id == "soul_infernal")
+        entries = {
+            spec.description_key: "造成爆炸伤害。",
+            spec.name_key: "炼狱龙魂",
+        }
+        row = monster_buff_row(spec, entries, {}, "16.20")
+        self.assertEqual(row["name"], "炼狱龙魂")
+        self.assertEqual(row["description"], "造成爆炸伤害。")
+
+    def test_row_skipped_without_description(self):
+        spec = MONSTER_BUFF_CATALOG[0]
+        self.assertIsNone(monster_buff_row(spec, {}, {}, "16.20"))
+
+    def test_parse_deterministic_and_skips_blanks(self):
+        spec = MONSTER_BUFF_CATALOG[0]
+        zh = {spec.description_key: "<mainText>效果</mainText>"}
+        first = parse_monster_buffs(zh, {}, "16.20")
+        second = parse_monster_buffs(zh, {}, "16.20")
+        self.assertEqual(first, second)
+        self.assertEqual([row["id"] for row in first], [spec.id])
+
+    def test_parse_empty_table(self):
+        self.assertEqual(parse_monster_buffs(None, None, "16.20"), [])
 
 
 class ParseMonstersTest(unittest.TestCase):
